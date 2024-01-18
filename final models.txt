@@ -1,0 +1,102 @@
+using MarkAttendance.Models;
+using System.Security.Cryptography;
+using System.Xml.Linq;
+
+namespace MarkAttendance.Models
+{
+    public class Attendances
+    {
+        public int Att_id { get; set; }
+
+        public int SId {  get; set; }
+
+        public string SName { get; set; } 
+
+        public DateTime Date { get; set; }
+
+        public string CName { get;set; }
+
+        public Char Attendance { get; set; }
+    }
+}
+
+namespace MarkAttendance.Models
+{
+    public class Course
+    {
+        public int CId { get; set; }
+        public string CName { get; set; }
+        public int CDuration { get; set; }
+
+        public DateTime StartDate { get; set; }
+
+        public DateTime EndDate { get; set; }
+
+        public string Availability { get; set; }
+
+        public string CDescription { get; set; }
+
+        public string CPrequisite { get; set; }
+
+        public string OutCome { get; set; }
+
+    }
+}
+
+
+namespace MarkAttendance.Models
+{
+    public class Courses
+    {
+        public int CId { get; set; }
+        public string CourseName { get; set; }
+        public string CreatedBy { get; set; }
+    }
+}
+
+
+using System.ComponentModel.DataAnnotations;
+
+namespace MarkAttendance.Models
+{
+    public class FeesStructure
+    {
+        
+        public int Regid { get; set; }
+
+        
+        public string SName { get; set; }
+
+        public int CId { get; set; }
+
+        
+        public string CName { get; set; }
+
+        public long TCFees { get; set; }
+
+       
+        public string POption { get; set; }
+
+      
+        public int ICount { get; set; }
+
+        public long APay { get; set; }
+
+       
+        public long PAmount { get; set; }
+
+     
+        public string PType { get; set; }
+    }
+}
+
+namespace MarkAttendance.Models
+{
+    public class Module
+    {
+        public int MId { get; set; }
+        public string MName { get; set; }
+        public int CId { get; set; }
+   
+    }
+}

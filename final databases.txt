@@ -1,0 +1,85 @@
+CREATE TABLE [dbo].[Attendances] (
+    [Att_id]     INT          IDENTITY (1, 1) NOT NULL,
+    [SId]        INT          NOT NULL,
+    [SName]      VARCHAR (50) NOT NULL,
+    [Date]       DATETIME     NOT NULL,
+    [CName]      VARCHAR (50) NOT NULL,
+    [Attendance] CHAR (1)     NOT NULL
+);
+
+data
+1	1	Nikhil	10-01-2024 00:00:00	Python	P
+2	3	santhosh10-01-2024 00:00:00	Python	P
+3	4	Suresh	10-01-2024 00:00:00	Python	P
+4	2	Sam	04-01-2024 00:00:00	Java	P
+5	5	sundar	04-01-2024 00:00:00	Java	P
+6	6	partha	04-01-2024 00:00:00	Java	P
+NULL	NULL	NULL	NULL	NULL	NULL
+
+
+CREATE TABLE [dbo].[Course] (
+    [CId]          INT          IDENTITY (1, 1) NOT NULL,
+    [CName]        VARCHAR (50) NULL,
+    [CDuration]    INT          NOT NULL,
+    [StartDate]    DATE         NOT NULL,
+    [EndDate]      DATE         NOT NULL,
+    [Availability] VARCHAR (50) NOT NULL,
+    [CDescription] VARCHAR (50) NOT NULL,
+    [CPrequisite]  VARCHAR (50) NOT NULL,
+    [OutCome]      VARCHAR (50) NOT NULL
+);
+
+data
+1	Python	2	12-12-2023	02-02-2024	Yes	Language	nus	Developer
+2	Java	3	12-12-2023	03-03-2024	yes	Language	nus	Developer
+NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL
+
+CREATE TABLE [dbo].[Courses] (
+    [CId]        INT          IDENTITY (1, 1) NOT NULL,
+    [CourseName] VARCHAR (50) NULL,
+    [CreatedBy]  VARCHAR (50) NULL
+);
+
+data
+1	python	sagar
+2	java	nithish
+NULL	NULL	NULL
+
+CREATE TABLE [dbo].[FeesStructure] (
+    [Regid]   INT          IDENTITY (1, 1) NOT NULL,
+    [SName]   VARCHAR (50) NOT NULL,
+    [CId]     INT          NOT NULL,
+    [CName]   VARCHAR (50) NOT NULL,
+    [TCFees]  BIGINT       NOT NULL,
+    [POption] VARCHAR (50) NOT NULL,
+    [ICount]  INT          NOT NULL,
+    [APay]    BIGINT       NOT NULL,
+    [PAmount] BIGINT       NOT NULL,
+    [PType]   VARCHAR (50) NOT NULL
+);
+
+data
+1	Nikhil	1	Python	20000	card	2	10000	10000	card
+2	Sam	2	Java	25000	cash	1	15000	10000	cash
+3	santhosh	1	python	20000	cash	2	1213	3445	cash
+4	Suresh	1	python	20000	card	2	4387	10000	card
+5	sundar	2	java	25000	cash	2	20000	10000	cash
+6	partha	2	java	25000	cash	1	20000	10000	cash
+NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL
+
+
+CREATE TABLE [dbo].[Module] (
+    [MId]   INT          IDENTITY (1, 1) NOT NULL,
+    [MName] VARCHAR (50) NULL,
+    [CId]   INT          NOT NULL
+);
+
+data
+1	Intro to python	1
+2	Basics	1
+3	oops	1
+4	Intro to java	2
+5	Basics-java	2
+6	oops-java	2
+NULL	NULL	NULL
+
