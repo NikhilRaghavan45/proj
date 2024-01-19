@@ -1,0 +1,424 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import moment from 'moment';
+import './External.css';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
+const CourseComp = () => {
+  const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState('');
+  const [modules, setModules] = useState([]);
+  const [selectedModule, setSelectedModule] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [students, setStudents] = useState([]);
+  const [attendance, setAttendance] = useState([]);
+  const [courseDates, setCourseDates] = useState({ startDate: null, endDate: null });
+  const [isTableVisible, setIsTableVisible] = useState(false);
+
+  // Additional state variables for default values
+  const [defaultCourse, setDefaultCourse] = useState('');
+  const [defaultModule, setDefaultModule] = useState('');
+  const [defaultDate, setDefaultDate] = useState(null);
+
+  // State variable for date error message
+  const [dateErrorMessage, setDateErrorMessage] = useState('');
+
+  useEffect(() => {
+    // Fetch courses from the API when the component mounts
+    axios.get('https://localhost:7069/api/Course/GetNotes')
+      .then(response => {
+        console.log('Fetched courses:', response.data);
+        setCourses(response.data);
+      })
+      .catch(error => console.error('Error fetching courses:', error));
+  }, []);
+
+  useEffect(() => {
+    // Fetch modules based on the selected course
+    if (selectedCourse !== '') {
+      axios.get(`https://localhost:7069/api/Course/GetModules/${selectedCourse}`)
+        .then(response => {
+          console.log('Fetched modules:', response.data);
+
+          // Retrieve start and end dates from the course data
+          const { StartDate: startDate, EndDate: endDate } = response.data[0];
+
+          // Set modules and course dates
+          setModules(response.data);
+          setCourseDates({ startDate, endDate });
+          console.log(startDate, endDate);
+
+          // Automatically select the first module for the course
+          if (response.data.length > 0) {
+            setSelectedModule(response.data[0].mId);
+          }
+        })
+        .catch(error => console.error('Error fetching modules:', error));
+    }
+  }, [selectedCourse]);
+
+  useEffect(() => {
+    // Fetch modules based on the selected course
+    if (selectedCourse !== '') {
+      // Fetch course dates
+      // Fetch course dates
+      axios.get(`https://localhost:7069/api/Course/GetCourseDates/${selectedCourse}`)
+        .then(response => {
+          console.log('Fetched course dates:', response.data);
+
+          // Check if dates are present in the response
+          if (response.data && response.data.startDate && response.data.endDate) {
+            const { startDate, endDate } = response.data;
+
+            // Set course dates
+            setCourseDates({ startDate, endDate });
+            console.log('startDate:', startDate);
+            console.log('endDate:', endDate);
+
+            // Continue fetching modules
+            axios.get(`https://localhost:7069/api/Course/GetModules/${selectedCourse}`)
+              .then(response => {
+                console.log('Fetched modules:', response.data);
+
+                // Automatically select the first module for the course
+                if (response.data.length > 0) {
+                  setSelectedModule(response.data[0].mId);
+                }
+
+                // Set modules
+                setModules(response.data);
+              })
+              .catch(error => console.error('Error fetching modules:', error));
+          } else {
+            console.error('Error: Dates are missing in the response.');
+          }
+        })
+        .catch(error => console.error('Error fetching course dates:', error));
+
+    }
+  }, [selectedCourse]);
+
+
+  const handleFetchDetails = () => {
+    console.log('Selected Course:', selectedCourse);
+    console.log('Selected Module:', selectedModule);
+    console.log('Selected Date:', selectedDate);
+
+    const moduleId = selectedModule;
+
+    const selectedDateMoment = moment(selectedDate).startOf('day'); // Start of the day
+
+    // Parse and convert the date strings to moment objects
+    const startDateMoment = moment(courseDates.startDate);
+    const endDateMoment = moment(courseDates.endDate);
+
+    console.log('selectedDateMoment:', selectedDateMoment);
+    console.log('startDateMoment:', startDateMoment);
+    console.log('endDateMoment:', endDateMoment);
+
+    console.log('Is selected date same or after start date:', selectedDateMoment.isSameOrAfter(startDateMoment, 'day'));
+    console.log('Is selected date same or before end date:', selectedDateMoment.isSameOrBefore(endDateMoment));
+
+    if (selectedDateMoment.isSameOrAfter(startDateMoment) && selectedDateMoment.isSameOrBefore(endDateMoment)) {
+      // The selected date is within the course duration
+      console.log('Selected date is within the course duration.');
+      setDateErrorMessage('');
+      setIsTableVisible(true);
+
+
+      const formattedDate = selectedDate ? selectedDate.toISOString().split('T')[0] : null;
+      const apiUrl = `https://localhost:7069/api/Course/GetStudents/${moduleId}/${formattedDate}`;
+      console.log('API URL:', apiUrl);
+
+      if (selectedCourse && selectedModule && selectedDate) {
+        axios.get(apiUrl)
+          .then(response => {
+            console.log('Fetched students:', response.data);
+            const studentsData = response.data.map(student => ({
+              studentId: student.regid,
+              studentName: student.sName,
+              courseId: student.cId,
+              courseName: student.cName,
+              moduleId: student.mId,
+              moduleName: student.mName,
+              POption: student.pOption,
+              ICount: student.iCount,
+              APay: student.aPay,
+              PAmount: student.pAmount,
+              PType: student.pType,
+            }));
+            console.log('Fetched students:', studentsData);
+            setStudents(studentsData);
+            setAttendance(studentsData.map(student => ({
+              SId: student.studentId,
+              SName: student.studentName,
+              Date: formattedDate,
+              Attendance: '',
+              CName: student.courseName,
+            })));
+          })
+          .catch(error => console.error('Error fetching students:', error));
+      }
+    } else {
+      const errorMessage = 'Selected date is not within the course duration.';
+      console.error(errorMessage);
+      setDateErrorMessage(errorMessage);
+      setIsTableVisible(false);
+    }
+  };
+
+
+
+
+
+
+
+  // const handleFetchDetails = () => {
+  //   console.log('Selected Course:', selectedCourse);
+  //   console.log('Selected Module:', selectedModule);
+  //   console.log('Selected Date:', selectedDate);
+
+  //   const moduleId = selectedModule;
+
+  //   const selectedDateMoment = moment(selectedDate);
+  //   const startDateMoment = moment(courseDates.startDate);
+  //   const endDateMoment = moment(courseDates.endDate);
+
+  //   console.log('selectedDateMoment:', selectedDateMoment);
+  //   console.log('startDateMoment:', startDateMoment);
+  //   console.log('endDateMoment:', endDateMoment);
+
+  //   // Use the `isSameOrAfter` method of Moment.js for comparison
+  //   if (selectedDateMoment.isSameOrAfter(startDateMoment, 'day') && selectedDateMoment.isSameOrBefore(endDateMoment, 'day')) {
+  //     // The selected date is within the course duration
+  //     console.log('Selected date is within the course duration.');
+  //     setDateErrorMessage('');
+  //     // ... rest of your code
+
+  //     const formattedDate = selectedDate ? selectedDate.toISOString().split('T')[0] : null;
+  //     const apiUrl = `https://localhost:7069/api/Course/GetStudents/${moduleId}/${formattedDate}`;
+  //     console.log('API URL:', apiUrl);
+
+  //     if (selectedCourse && selectedModule && selectedDate) {
+  //       axios.get(apiUrl)
+  //         .then(response => {
+  //           console.log('Fetched students:', response.data);
+  //           const studentsData = response.data.map(student => ({
+  //             studentId: student.regid,
+  //             studentName: student.sName,
+  //             courseId: student.cId,
+  //             courseName: student.cName,
+  //             moduleId: student.mId,
+  //             moduleName: student.mName,
+  //             POption: student.pOption,
+  //             ICount: student.iCount,
+  //             APay: student.aPay,
+  //             PAmount: student.pAmount,
+  //             PType: student.pType,
+  //           }));
+  //           console.log('Fetched students:', studentsData);
+  //           setStudents(studentsData);
+  //           setAttendance(studentsData.map(student => ({
+  //             SId: student.studentId,
+  //             SName: student.studentName,
+  //             Date: formattedDate,
+  //             Attendance: '',
+  //             CName: student.courseName,
+  //           })));
+  //           setIsTableVisible(true); // Show the table
+
+  //           // Update default values
+  //           setDefaultCourse(selectedCourse);
+  //           setDefaultModule(selectedModule);
+  //           setDefaultDate(selectedDate);
+  //         })
+  //         .catch(error => console.error('Error fetching students:', error));
+  //     }
+  //   } else {
+  //     const errorMessage = 'Selected date is not within the course duration.';
+  //     console.error(errorMessage);
+  //     setDateErrorMessage(errorMessage);
+  //     setIsTableVisible(false); // Hide the table
+  //   }
+  // };
+
+
+  const handleSaveAttendance = () => {
+    if (attendance.length === 0) {
+      console.log('No attendance data to save.');
+      return;
+    }
+
+    axios.post('https://localhost:7069/api/Course/SaveAttendance', attendance)
+      .then(response => {
+        console.log('Attendance saved successfully:', response.data);
+        window.alert('Attendance saved successfully!');
+      })
+      .catch(error => {
+        console.error('Error saving attendance:', error);
+        window.alert('Invalid! Attendance not saved.');
+      });
+
+    // Reset to default values after saving attendance
+    setSelectedCourse(defaultCourse);
+    setSelectedModule(defaultModule);
+    setSelectedDate(defaultDate);
+    setIsTableVisible(false); // Close the table
+  };
+
+
+  
+
+  const handleAttendanceChange = (studentId, status) => {
+    const updatedAttendance = [...attendance];
+    const studentIndex = updatedAttendance.findIndex(student => student.SId === studentId);
+
+    if (studentIndex !== -1) {
+      updatedAttendance[studentIndex].Attendance = status;
+      setAttendance(updatedAttendance);
+    }
+  };
+
+  const handleInputFieldClick = () => {
+    if (isTableVisible) {
+      setIsTableVisible(false); // Close the table if it's open
+    }
+  };
+
+  return (
+    <div>
+      <div className='container'>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '10px 0px' }}>
+          <div style={{ display: 'flex', marginBottom: '10px' }}>
+            <label htmlFor="courseDropdown" className='label1' style={{ minWidth: '150px', marginRight: '10px' }}>Select Course</label>
+            <select
+              id="courseDropdown"
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+              onClick={handleInputFieldClick}
+              onFocus={() => setDateErrorMessage('')}
+            >
+              {courses.length === 0 ? (
+                <option value="" disabled className='option'>No courses available</option>
+              ) : (
+                <>
+                  <option value="" disabled hidden>Select Course</option>
+                  {courses.map(course => (
+                    <option key={course.cId} value={course.cId} className='option'>
+                      {course.cName}
+                    </option>
+                  ))}
+                </>
+              )}
+            </select>
+          </div>
+          <div style={{ display: 'flex', marginBottom: '10px' }}>
+            <label htmlFor="moduleDropdown" className='label1' style={{ minWidth: '150px', marginRight: '10px' }}>Select Module</label>
+            <select
+              id="moduleDropdown"
+              value={selectedModule}
+              onChange={(e) => setSelectedModule(e.target.value)}
+              disabled={!selectedCourse}
+              onClick={handleInputFieldClick}
+            >
+              {modules.length === 0 ? (
+                <option value="" disabled className='option'>Select Module</option>
+              ) : (
+                <>
+                  <option value="" disabled hidden>Select Module</option>
+                  {modules.map(module => (
+                    <option key={module.mId} value={module.mId} className='option'>
+                      {module.mName}
+                    </option>
+                  ))}
+                </>
+              )}
+            </select>
+          </div>
+          <div style={{ display: 'flex', marginBottom: '10px' }}>
+            <label htmlFor="datepicker" className='label1' style={{ minWidth: '150px', marginRight: '10px' }}>Select Date</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="date"
+                id="datepicker"
+                value={selectedDate ? moment(selectedDate).format('YYYY-MM-DD') : ''}
+                onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                disabled={!selectedModule}
+                min={courseDates.startDate ? moment(courseDates.startDate).format('YYYY-MM-DD') : ''}
+                max={courseDates.endDate ? moment(courseDates.endDate).format('YYYY-MM-DD') : ''}
+                onFocus={() => setDateErrorMessage('')}
+              />
+            </div>
+          </div>
+          {dateErrorMessage && (
+            <div style={{ color: 'red', marginTop: '10px' }}>
+              {dateErrorMessage}
+            </div>
+          )}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 0px' }}>
+          <button className='btn btn-primary' onClick={handleFetchDetails} disabled={!selectedCourse || !selectedModule || !selectedDate}>
+            Fetch
+          </button>
+        </div>
+
+      </div>
+      {isTableVisible && students.length > 0 && (
+        <div style={{ padding: '10px 0px' }}>
+          <h2>Student Details</h2>
+          <table className='attendance-table'>
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Date</th>
+                <th>Attendance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {students.map(student => (
+                <tr key={student.studentId}>
+                  <td className='label1'>{student.studentId}</td>
+                  <td className='label1'>{student.studentName}</td>
+                  <td className='label1'>{selectedDate ? selectedDate.toLocaleDateString('en-US') : 'No Date Selected'}</td>
+                  <td>
+                    <label className='label1'>
+                      Present
+                      <input
+                        type="radio"
+                        name={`attendance_${student.studentId}`}
+                        value="P"
+                        onChange={() => handleAttendanceChange(student.studentId, 'P')}
+                        style={{ marginLeft: '5px' }}
+                        checked={attendance.some(a => a.SId === student.studentId && a.Attendance === 'P')}
+                      />
+                    </label>
+                    <label className='label1'>
+                      Absent
+                      <input
+                        type="radio"
+                        name={`attendance_${student.studentId}`}
+                        value="A"
+                        onChange={() => handleAttendanceChange(student.studentId, 'A')}
+                        style={{ marginLeft: '5px' }}
+                        checked={attendance.some(a => a.SId === student.studentId && a.Attendance === 'A')}
+                      />
+                    </label>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 0px' }}>
+            <button className='btn btn-primary' onClick={handleSaveAttendance} disabled={attendance.length === 0}>
+              Save Attendance
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CourseComp;
