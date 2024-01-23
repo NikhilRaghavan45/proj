@@ -1,0 +1,247 @@
+Certainly! Below is the documentation for the provided ASP.NET Core backend code within the CourseController. This includes an overview of the controller, explanations for key endpoints, and details about how the controller interacts with the database.
+
+CourseController Documentation
+Overview
+The CourseController is an ASP.NET Core MVC controller responsible for handling requests related to course management and attendance tracking. It communicates with a database to retrieve and manipulate data.
+
+Constructor
+csharp
+Copy code
+public CourseController(IConfiguration configuration)
+Description: Constructor for initializing the controller with an instance of IConfiguration to access configuration settings.
+Endpoints
+GetNotes
+
+Endpoint: /api/Course/GetNotes
+HTTP Method: GET
+Description: Retrieves a list of available courses with details such as course ID, name, duration, start date, end date, availability, description, prerequisite, and outcome.
+Returned Data: List of Course objects.
+GetModules
+
+Endpoint: /api/Course/GetModules/{courseId}
+HTTP Method: GET
+Description: Retrieves a list of modules for a given course ID.
+Parameters: courseId - ID of the course.
+Returned Data: List of Module objects.
+GetStudents
+
+Endpoint: /api/Course/GetStudents/{moduleId}/{selectedDate}
+HTTP Method: GET
+Description: Retrieves a list of students for a given module ID and selected date.
+Parameters: moduleId - ID of the module, selectedDate - Selected date for attendance.
+Returned Data: List of FeesStructure objects representing student details.
+GetCourseDates
+
+Endpoint: /api/Course/GetCourseDates/{courseId}
+HTTP Method: GET
+Description: Retrieves start and end dates for a given course ID.
+Parameters: courseId - ID of the course.
+Returned Data: Object with StartDate and EndDate properties.
+GetAttendance
+
+Endpoint: /api/Course/GetAttendance/{courseId}/{selectedDate}
+HTTP Method: GET
+Description: Retrieves attendance records for a given course ID and selected date.
+Parameters: courseId - ID of the course, selectedDate - Selected date for attendance.
+Returned Data: List of Attendances objects.
+GetAttendances
+
+Endpoint: /api/Course/GetAttendances
+HTTP Method: GET
+Description: Retrieves all attendance records.
+Returned Data: List of Attendances objects.
+GetAttendanceDetails
+
+Endpoint: /api/Course/GetAttendanceDetails/{courseName}/{selectedDate}
+HTTP Method: GET
+Description: Retrieves attendance details for a given course name and selected date.
+Parameters: courseName - Name of the course, selectedDate - Selected date for attendance.
+Returned Data: List of Attendances objects.
+CheckAttendance
+
+Endpoint: /api/Course/CheckAttendance/{studentId}/{selectedDate}
+HTTP Method: GET
+Description: Checks if attendance records exist for a given student ID and selected date.
+Parameters: studentId - ID of the student, selectedDate - Selected date for attendance.
+Returned Data: Boolean indicating whether attendance records exist.
+SaveAttendance
+
+Endpoint: /api/Course/SaveAttendance
+HTTP Method: POST
+Description: Saves attendance records to the database.
+Parameters: List of Attendances objects in the request body.
+Returned Data: Success message or error.
+Database Interaction
+The controller uses stored procedures for database interactions, executing SQL commands to retrieve and manipulate data.
+
+sp_GetNotes
+
+Retrieves course information.
+sp_GetModules
+
+Retrieves modules for a given course ID.
+sp_GetStudents
+
+Retrieves students for a given module ID and selected date.
+sp_GetCourseDates
+
+Retrieves start and end dates for a given course ID.
+sp_GetAttendance
+
+Retrieves attendance records.
+sp_GetAttendances
+
+Retrieves all attendance records.
+sp_GetAttendanceDetails
+
+Retrieves attendance details for a given course name and selected date.
+sp_CheckAttendance
+
+Checks if attendance records exist for a given student ID and selected date.
+sp_SaveAttendance
+
+Saves attendance records to the database.
+Error Handling
+Error handling is implemented, and in case of an exception, a 500 Internal Server Error response is returned.
+
+Usage Notes
+Ensure the database connection string is correctly configured in the app settings.
+Review the stored procedures (sp_GetNotes, sp_GetModules, etc.) for their implementations and verify they match the database schema.
+Test each endpoint to ensure proper functionality.
+Version
+The code is written using ASP.NET Core MVC.
+Dependencies: Microsoft.AspNetCore.Mvc, Microsoft.Extensions.Configuration.
+Last Updated: Provide the date of the last update to the documentation.
+This documentation provides an overview of the CourseController, its endpoints, interactions with the database, and usage notes. Review and adapt the controller based on the specific requirements of your project.
+
+
+
+
+
+
+
+Certainly! Below is the documentation for the provided React component. This includes an overview of the component, explanations for key functions and state variables, and details about how the component interacts with external APIs.
+
+CourseComp Component Documentation
+Overview
+The CourseComp component is a React component designed for managing attendance details for courses and modules. It includes functionality for selecting a course, module, and date, fetching student details based on the selected parameters, recording attendance, and saving attendance data.
+
+State Variables
+courses
+
+Type: Array
+Description: Holds the list of available courses fetched from the API.
+selectedCourse
+
+Type: String
+Description: Represents the currently selected course by its ID.
+modules
+
+Type: Array
+Description: Holds the list of modules associated with the selected course.
+selectedModule
+
+Type: String
+Description: Represents the currently selected module by its ID.
+selectedDate
+
+Type: Date
+Description: Represents the selected date for attendance.
+students
+
+Type: Array
+Description: Holds the list of students fetched from the API based on the selected module and date.
+attendance
+
+Type: Array
+Description: Represents the attendance data, initially derived from the students' list.
+courseDates
+
+Type: Object
+Description: Holds the start and end dates for the selected course.
+isTableVisible
+
+Type: Boolean
+Description: Controls the visibility of the student details table.
+isAttendanceSaved
+
+Type: Boolean
+Description: Indicates whether attendance has already been saved for the selected module and date.
+defaultCourse, defaultModule, defaultDate
+
+Type: String, String, Date
+Description: Stores the default values for course, module, and date, respectively.
+dateErrorMessage
+
+Type: String
+Description: Holds an error message related to date validation.
+Key Functions
+useEffect for Fetching Courses
+
+Description: Fetches the list of courses from the API when the component mounts.
+useEffect for Fetching Modules
+
+Description: Fetches modules based on the selected course and updates course dates.
+useEffect for Fetching Course Dates
+
+Description: Fetches course dates based on the selected course and triggers module fetching.
+checkAttendanceSaved
+
+Description: Checks if attendance is already saved for the selected module and date.
+handleFetchDetails
+
+Description: Fetches student details based on the selected course, module, and date. Handles date validation.
+handleSaveAttendance
+
+Description: Saves attendance data to the API and resets selected values after saving.
+handleAttendanceChange
+
+Description: Updates the attendance status for a specific student in the attendance array.
+External APIs
+Get Courses API
+
+Endpoint: https://localhost:7069/api/Course/GetNotes
+Description: Fetches the list of available courses.
+Get Modules API
+
+Endpoint: https://localhost:7069/api/Course/GetModules/:courseId
+Description: Fetches modules based on the selected course.
+Get Course Dates API
+
+Endpoint: https://localhost:7069/api/Course/GetCourseDates/:courseId
+Description: Fetches start and end dates for the selected course.
+Get Students API
+
+Endpoint: https://localhost:7069/api/Course/GetStudents/:moduleId/:date
+Description: Fetches students based on the selected module and date.
+Check Attendance API
+
+Endpoint: https://localhost:7069/api/Course/CheckAttendance/:moduleId/:date
+Description: Checks if attendance is saved for the selected module and date.
+Save Attendance API
+
+Endpoint: https://localhost:7069/api/Course/SaveAttendance
+Method: POST
+Description: Saves attendance data to the API.
+Usage
+Select a course from the dropdown.
+After selecting a course, choose a module.
+Pick a date within the course duration.
+Click the "Fetch" button to retrieve student details.
+Record attendance by selecting "Present" or "Absent" for each student.
+Click the "Save Attendance" button to save the attendance data.
+Notes
+The component uses Axios for making asynchronous HTTP requests.
+Moment.js is utilized for date manipulation and formatting.
+The user interface includes dropdowns, date input, and radio buttons for user interactions.
+Important Points
+Ensure the API URLs are correct and accessible.
+Review the handling of date validations and error messages.
+Confirm the structure of data returned by the APIs for courses, modules, course dates, and students.
+Test the component thoroughly to ensure proper functionality and error handling.
+Version
+The code is written using React with functional components and hooks.
+Dependencies: Axios, Moment.js, and React-datepicker.
+Last Updated
+Provide the date of the last update to the documentation.
+This documentation provides an overview of the CourseComp component, its state variables, key functions, and interactions with external APIs. Review and adapt the component based on the specific requirements of your project.
