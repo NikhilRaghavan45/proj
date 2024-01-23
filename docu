@@ -1,0 +1,122 @@
+
+Full-Stack Documentation: Attendance Management System
+Table of Contents
+Introduction
+Project Overview
+Frontend
+Components
+State Management
+API Calls
+Functionality
+Usage
+Backend
+Controllers
+API Endpoints
+Database Schema
+Configuration
+Error Handling
+Dependencies
+Security Considerations
+Contributing
+License
+Introduction
+This document provides comprehensive documentation for the Attendance Management System, covering both frontend and backend aspects. The system is designed to manage student attendance for courses and modules, providing features for fetching, saving, and viewing attendance data.
+
+Project Overview
+The Attendance Management System consists of two main components:
+
+Frontend: The user interface built using React.js.
+Backend: The server-side logic implemented with ASP.NET Core.
+The frontend and backend communicate through RESTful API endpoints, enabling seamless integration and interaction between the two components.
+
+Frontend
+Components
+The frontend is organized into React components responsible for different parts of the system. Key components include:
+
+CourseComp: Manages the selection of courses, modules, and dates for attendance tracking. Allows users to fetch student details, mark attendance, and save attendance data.
+
+ViewComp: Displays a table of student attendance details, providing a search functionality for easier data retrieval.
+
+State Management
+State management is handled using React's useState hook. Key states include:
+
+courses: Holds the list of available courses.
+selectedCourse: Tracks the currently selected course.
+modules: Stores the list of modules associated with the selected course.
+selectedModule: Tracks the currently selected module.
+selectedDate: Stores the chosen date for attendance tracking.
+students: Contains the list of students fetched based on the selected module and date.
+attendance: Represents the attendance data to be saved.
+isTableVisible: Controls the visibility of the attendance table.
+isAttendanceSaved: Indicates whether attendance has been previously saved.
+selectAll: Manages the state of the "Select All" feature.
+dateErrorMessage: Stores error messages related to date selection.
+API Calls
+Axios is used for making HTTP requests to the backend API. Key API calls include:
+
+Fetching Courses: GET request to /api/Course/GetNotes retrieves the list of courses.
+Fetching Modules: GET request to /api/Course/GetModules/{courseId} fetches modules for a specific course.
+Fetching Students: GET request to /api/Course/GetStudents/{moduleId}/{selectedDate} retrieves student details for a specific module and date.
+Checking Attendance: GET request to /api/Course/CheckAttendance/{studentId}/{selectedDate} checks if attendance has already been saved.
+Saving Attendance: POST request to /api/Course/SaveAttendance saves the attendance data.
+Functionality
+The frontend provides the following functionalities:
+
+Selection of courses, modules, and dates.
+Fetching student details based on selected module and date.
+Marking attendance for individual students.
+Selecting or deselecting all students at once.
+Saving attendance data to the backend.
+Displaying success messages or indicating if attendance has been previously saved.
+Usage
+To use the frontend:
+
+Select a course from the dropdown.
+Choose a module associated with the selected course.
+Pick a date for attendance tracking.
+Click the "Fetch" button to retrieve student details.
+Mark attendance for individual students.
+Use the "Select All" button to toggle attendance for all students.
+Click the "Save Attendance" button to save the attendance data.
+Backend
+Controllers
+The backend is implemented using ASP.NET Core controllers. Key controllers include:
+
+CourseController: Manages the retrieval of course, module, student, and attendance data. Provides endpoints for saving and checking attendance.
+API Endpoints
+The backend exposes several API endpoints, including:
+
+GET /api/Course/GetNotes: Fetches the list of courses.
+GET /api/Course/GetModules/{courseId}: Retrieves modules for a specific course.
+GET /api/Course/GetStudents/{moduleId}/{selectedDate}: Fetches student details for a module and date.
+GET /api/Course/GetCourseDates/{courseId}: Retrieves start and end dates for a course.
+GET /api/Course/CheckAttendance/{studentId}/{selectedDate}: Checks if attendance has already been saved.
+POST /api/Course/SaveAttendance: Saves attendance data.
+Database Schema
+The backend interacts with a relational database using a SQL Server. Key entities include:
+
+Course: Represents information about a course.
+Module: Represents a module associated with a course.
+FeesStructure: Contains details about students and their fees.
+Attendances: Stores attendance records for students.
+Configuration
+Configuration settings, such as database connection strings, are managed using the appsettings.json file and injected into controllers.
+
+Error Handling
+The backend employs error handling mechanisms to respond appropriately to exceptions. It returns relevant HTTP status codes and error messages.
+
+Dependencies
+The backend relies on the following dependencies:
+
+Microsoft.AspNetCore.Mvc: Framework for building web APIs.
+Microsoft.Extensions.Configuration: Facilitates configuration management.
+System.Data.SqlClient: Provides data access to SQL Server.
+Newtonsoft.Json: Handles JSON serialization and deserialization.
+Security Considerations
+The backend includes basic error handling and validation. However, it's essential to implement additional security measures, such as authentication and authorization, based on specific deployment requirements.
+
+Contributing
+Contributions to the Attendance Management System are welcome. Before contributing, please review the guidelines in the project repository.
+
+License
+This project is licensed under the MIT License.
